@@ -1,18 +1,50 @@
-const scriptOptions = {};
+const scriptOptions = 
+{
+    LogAllInfo:false
+};
+
+//Find selected element
+
 
 const element = getSelectedElement();
-let messages = []; 
 
-if(element)  //only do something when the element exists
-{
-    messages.push('ID: '+ element.ID);
-    messages.push('CSS selector: ' + getCssSelector(element));
-    messages.push('Click text: '+ element.innerText);
-    messages.push('value: '+ element.value);
-    messages.push('click URL: '+ element.getAttribute('href'));
+if(scriptOptions.LogAllInfo){
+    let messages = []; 
+    
+    if(element)  //only do something when the element exists
+    {
+        messages.push('ID: '+ element.ID);
+        messages.push('CSS selector: ' + getCssSelector(element));
+        messages.push('Click text: '+ element.innerText);
+        messages.push('value: '+ element.value);
+        messages.push('click URL: '+ element.getAttribute('href'));
+    }
+    
+    messages.forEach((msg) => {console.log(msg); }); 
+    console.log('\n');
 }
 
-messages.forEach((msg) => {console.log(msg); }); 
+console.log('Suggested trigger for click');
+
+if(element.getAttribute('href'))
+{
+    console.log('Click just links'); 
+    console.log('Click URL contains ' + element.getAttribute('href'));
+}
+else if (element.ID)
+{
+    console.log('Click all elements'); 
+    console.log('Click ID equals ' + element.ID);
+}
+else
+{
+    console.log('Click all elements');
+    console.log('CSS selector:' + getCssSelector(element));
+    if(element.innerText)
+    {
+        console.log('Click Text contains ' + element.innerText);
+    };
+}
 
 
 //functions
@@ -30,9 +62,10 @@ function getSelectedElement()
 function getCssSelector(element) {
     if (!(element instanceof Element)) return null;
 
+    // Helper function to escape CSS identifiers
     function escapeCssIdentifier(identifier) {
-            return CSS.escape(identifier);
-        }
+        return CSS.escape(identifier);
+    }
 
     const path = [];
     while (element.nodeType === Node.ELEMENT_NODE) {
@@ -56,11 +89,13 @@ function getCssSelector(element) {
             const classes = element.className.split(/\s+/).map(escapeCssIdentifier);
             selector += `.${classes.join('.')}`;
         }
-      
+
+        // Skip :nth-of-type to simplify the selector
         path.unshift(selector);
         element = element.parentNode;
     }
 
     return path.join(" > ");
+
     
 }
